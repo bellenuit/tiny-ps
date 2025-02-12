@@ -305,3 +305,32 @@ file **run** (is not actually reading a file. string of file must be bound for u
 dictionary **setpagedevice** (possible keys: canvas, canvasurl, color, console, height, oversampling, interval, pdf, pdfurl, raw, rswurl, svg, svgurl, textmode, transparent, width, height)
 
 **showpage** (don't forget that one)
+
+## Architecture
+
+tinyPStag is an extension of HTML-element. It observes changes of the tiny-ps tag node, creates CANVAS, SVG or A nodes in the shadow DOM.
+
+rpnContext is the memory of the processor. It holds the stack, the dictionary stack, the graphics stack, the devices information and references to the nodes.
+
+tinyPStag creates a context and handles it together with the PostScript code to rpn, the processor.
+
+rpn reads each word of the code and processes it: It either puts it on the stack or it runs a procedure, which may be a built in operator or a defined procedure. 
+
+rpnOperators read from the stack, process and write to the stack. Sometimes they have effects on the dictionary and the graphics state. Sometimes they even call rpn in a recursive way. Some operators work on the devices (fill show showpage stroke)
+
+rpnDevices fill and stroke paths in their repsective way. rpnCanvasDevice draws on the Canvas using the Canvas API. rpnSVGDevice converts them to SVG elements. rpnPDFDevice writes PDF manually. All devices can produce images but also downloadable links (data URL).
+
+A bigger part of the code is rpnTTF who parses, with the help of rpnBinary TrueType files. 
+
+## rpnRawDevice
+
+A special device is rpnRawDevice. This code has started as an academic excerice to understand and build the processor from the ground up using only mathematical methods and no API. Several algorithms had to be created aside from the rpn stack processor.
+
+- rpnScanFill to fill closed polygons (using both even odd and zero winding rules)
+- rpnBezier to convert curves to straight lines so that we can make polygons
+- a method to convert a stroke of a certain thickness to a polygon.
+- a mtehod to clip
+- a method to handle correctly painting with alpha channel on transparent objects.
+
+
+
