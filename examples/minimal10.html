@@ -1,0 +1,138 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Minimal editorFactory interface</title>
+	<style>
+div.editzone { border: 1px solid black; width: 600px; }
+div.editheader { color: white; background-color: black; width: 100%; text-align: center; }
+form { text-align: right;   }
+form button { display: block; margin-left: 10px; margin-top: 10px;} 
+textarea.pseditor { width: calc(100% - 20px); display: block;  margin-left: 10px; margin-top: 10px; height: auto; }
+div.jsconsole { background-color: lightgray ; width: 580px; min-height: 20px; padding: 10px; font-family: monospace }
+canvas.jscanvas {margin: 5px; }
+svg.jssvg {margin: 5px; }
+div.editzone a {margin: 10px; font-family: monospace}
+body { background-color: gray }
+.editzone { background-color: white }
+</style>
+</head>
+<body>
+<h4>Webcomponent</h4>
+<p><select id="scriptmenu"></select>
+<tiny-ps id="ps" width=590 height=330 format="svg" transparent="0" oversampling="1">
+100 100 moveto 200 100 lineto 150 200 lineto closepath
+/triangle { moveto 100 0 rlineto -50 100 rlineto closepath } def
+200 100 triangle
+240 140 triangle
+280 180 triangle 
+stroke 
+showpage
+</tiny-ps>
+<script src = "ps20250211.js"></script>
+<script>
+class tinyPStag extends HTMLElement {
+  static observedAttributes = ["innerHTML","width","height","format","oversampling","transparent"];
+
+  constructor() {
+    super();
+    this.shadow = this.attachShadow({mode: "open"});
+ 
+    const elementToObserve = this;
+    this.observer = new MutationObserver(function(mutationsList, observer) {
+	const target = mutationsList[0].target;
+    target.attributeChangedCallback("innerText","",target.innerHTML);
+	});
+
+    this.observer.observe(elementToObserve, {characterData: false, childList: true, attributes: false});
+  }
+
+  connectedCallback() {
+	console.log("Connected.");    
+  }
+
+  disconnectedCallback() {
+    console.log("Custom element removed from page.");
+  }
+
+  adoptedCallback() {
+    console.log("Custom element moved to new page.");
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    console.log(`Attribute ${name} has changed to ` + newValue);
+    
+    var context = new rpnContext; 
+    context.width = this.getAttribute("width");
+    context.height = this.getAttribute("height"); 
+    context.oversampling = this.getAttribute("oversampling"); 
+    context.transparent = this.getAttribute("transparent"); 
+   
+    var divnode = document.createElement("DIV");
+    var node;
+    
+    switch(this.getAttribute("format")) {
+	    case "raw": 
+	    	node = document.createElement("CANVAS");
+	    	console.log("adding rawnode"); 
+            node.id = "raw" + this.id;
+            node.className = "jscanvas";
+            node.style.display = "block";
+            node.width = context.width;
+            node.height = context.height; 
+            context.nodes.push(new rpnRawDevice(node, null));
+            break;
+        case "canvas":
+            console.log("adding canvasnode"); 
+	    	node = document.createElement("CANVAS");
+            node.id = "canvas" + this.id;
+            node.className = "jscanvas";
+            node.style.display = "block";
+            node.width = node.width;
+            node.height = node.height;
+            context.nodes.push(new rpnCanvasDevice(node, null));
+            break;
+        case "svg":
+            console.log("adding svgnode"); 
+	    	node = document.createElement("SVG");
+            node.id = "svg" + this.id;
+            node.className = "jssvg";
+            node.style.display = "block";
+            node.setAttribute("width","590px");
+            node.setAttribute("height","330px");
+            context.nodes.push(new rpnSVGDevice(node, null));
+            context.device.svg = 1;
+            break;
+        default: ; 
+    }
+    divnode.appendChild(node)
+    this.shadow.innerHTML = divnode.outerHTML;
+    context.nodes[0].clear(context.width, context.height, context.oversampling, context.transparent); 
+    context.async = 1;
+    const render = async () => {
+	    console.log("start render");
+	         
+	    context = rpn(this.innerHTML, context, true); 
+	    this.shadow.innerHTML = node.outerHTML;
+	    console.log("end render");
+	    if (context.lasterror) { 
+		    console.error("!" + context.lasterror); 
+		    console.log(context.stack.reduce((acc,v) => acc + v.dump + " " , " "));
+		    console.log(context.currentcode);
+		}
+	};
+	console.log("start fun");
+	render().then(v => { console.log("then "+Date.now()); } );   
+	console.log("end fun "+Date.now() );    
+    
+  }
+}
+customElements.define("tiny-ps", tinyPStag);
+
+</script>
+<script>
+	fontbasepath = "";
+</script>
+<script src = "scriptmenu.js"></script>
+</div>
+</body>
+</html>
