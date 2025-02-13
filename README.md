@@ -352,7 +352,7 @@ A special device is rpnRawDevice. This code has started as an academic excerice 
 If your fonts are not in the same folder than the HTML file, you will need to write a line of code after importing the script to redirect. The path must be defined relative to the base path of the HTML file.
 
 ```
-rpnFontBasePath = <PATH>;
+<script>rpnFontBasePath = <PATH>;</script>
 ```
 
 # PostScript Errors
