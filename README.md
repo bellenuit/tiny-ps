@@ -44,7 +44,7 @@ will display as
 
 ![PS-46](https://github.com/user-attachments/assets/a6e64d9e-df92-4a52-857f-e9ad1b5f661b)
 
-More examples here: http://belle-nuit.com/site/files/minimal14.html
+More examples here: https://belle-nuit.com/site/files/minimal14.html
 
 ## Node attributes
 
