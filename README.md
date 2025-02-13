@@ -347,7 +347,7 @@ A special device is rpnRawDevice. This code has started as an academic excerice 
 - a mtehod to clip
 - a method to handle correctly painting with alpha channel on transparent objects.
 
-# Font paths
+## Font paths
 
 If your fonts are not in the same folder than the HTML file, you will need to write a line of code after importing the script to redirect. The path must be defined relative to the base path of the HTML file.
 
@@ -355,7 +355,7 @@ If your fonts are not in the same folder than the HTML file, you will need to wr
 <script>rpnFontBasePath = <PATH>;</script>
 ```
 
-# PostScript Errors
+## PostScript Errors
 
 If your code has error, the processor will stop and error will be shown in the Browser console:
 
@@ -364,7 +364,7 @@ If your code has error, the processor will stop and error will be shown in the B
 - Read trail until error (note that this code may have been expanded during execution)
 
 
-# Bugs
+## Bugs
 
 If you have any bugs, please post an issue on Github. Please add the following informations
 
