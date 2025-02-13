@@ -299,7 +299,7 @@ rpnRawDevice = class {
             this.node.style.display = "none";
             if (this.urlnode) this.urlnode.style.display = "none";
             return context;
-        } console.log("raw showpage");
+        } 
         this.node.style.display = (context.device.raw) ? "block" : "none";
         const image = new ImageData(this.data, context.width * context.device.oversampling);
         const canvas = (this.node) ? this.node : document.createElement("CANVAS");
@@ -493,14 +493,13 @@ rpnPDFDevice = class {
         this.finalround = false;
         
     }
-    clear(width, height, oversampling, transparent) { console.log(height + " " + width)
+    clear(width, height, oversampling, transparent) { 
         if (Number.isFinite(width*1)) this.width = width;
         if (Number.isFinite(height*1)) this.height = height;
-        console.log(this.height + " set " + this.width)
         this.node.style.backgroundColor = (transparent == 0) ? "white" : "transparent";  
     }
     finalize(context) {
-        if (context.device.pdf + context.device.pdfurl < 1) return context; console.log("finalize PDF")
+        if (context.device.pdf + context.device.pdfurl < 1) return context; 
         const objects = [];
         this.catalog.Type = "/Catalog";
         this.catalog.Pages = "2 0 R ";
@@ -512,7 +511,7 @@ rpnPDFDevice = class {
             this.pageslist.Kids += (20+i)+" 0 R ";
         this.pageslist.Kids += "]";
         this.pageslist.Count = this.pages.length;
-        this.pageslist.MediaBox = "[0 0 " + this.width + " " + this.height + "]"; console.log(this.height + " fin " + this.width)
+        this.pageslist.MediaBox = "[0 0 " + this.width + " " + this.height + "]"; 
         objects.push([this.pageslist]);
 
         for (let i = 0; i < 17; i++)
@@ -2450,6 +2449,7 @@ rpnUnitTest("100 90 50 90 50 rcurveto","100 90 50 90 50 !stackunderflow");
 rpnOperators.readonly = function(context) {
     // makes a dictionary entry readonly. We ignore that operator for the moment
     return context;};
+    
 rpnOperators.repeat = function(context) {
     const [doit, n] = context.pop("any", "number");
     if (!doit) return context;
@@ -2620,18 +2620,18 @@ rpnOperators.search = function(context) {
     return context;
 };
 
-rpnOperators.setcachedevice = function(context) {
-    const [ury, urx, lly, llx, wy, wx] = context.pop("number","number","number","number","number","number");
-    const cd = [wx.value, wy.value, llx.value, lly.value, urx.value, ury.value ];
-    context.graphics.cachedevice = cd;
-    return context;
-};
-
 rpnOperators.setalpha = function(context) {
     const [a] = context.pop("number");
     if (!a) return context;
     const alimited = Math.min(Math.max(a.value,0),1);
     context.graphics.color[3] = Math.round(alimited * 255);
+    return context;
+};
+
+rpnOperators.setcachedevice = function(context) {
+    const [ury, urx, lly, llx, wy, wx] = context.pop("number","number","number","number","number","number");
+    const cd = [wx.value, wy.value, llx.value, lly.value, urx.value, ury.value ];
+    context.graphics.cachedevice = cd;
     return context;
 };
 
@@ -3900,21 +3900,21 @@ class tinyPStag extends HTMLElement {
   attributeChangedCallback(name, oldValue, newValue) {
     if (!this.ready) return;
     
-    console.log(`Attribute ${name} has changed to ` + newValue);
+    console.log(`Attribute ${name} has changed to ` + rpnLimitText(newValue));
     
     var context = new rpnContext;
     context.width = this.getAttribute("width") ?? 360;
     context.height = this.getAttribute("height") ?? 360;
-    context.device.oversampling = this.getAttribute("oversampling");
-    context.device.transparent = this.getAttribute("transparent");
-    context.device.interval = this.getAttribute("interval");
+    context.device.oversampling = this.getAttribute("oversampling") ?? 1;
+    context.device.transparent = this.getAttribute("transparent") ?? 0;
+    context.device.interval = this.getAttribute("interval") ?? 0;
     var divnode = document.createElement("DIV");
     var node;
     var othernode;
     
     switch(this.getAttribute("format")) {
         case "raw": 
-            console.log("adding rawnode");
+            console.log("Adding rawnode");
             node = document.createElement("CANVAS");
             node.id = "raw" + this.id;
             node.className = "jscanvas";
@@ -3925,7 +3925,7 @@ class tinyPStag extends HTMLElement {
             context.device.raw = 1;
             break;
         case "rawurl": 
-            console.log("adding rawnode");
+            console.log("Adding rawnode");
             othernode = document.createElement("CANVAS");
             othernode.id = "raw" + this.id;
             othernode.className = "jscanvas";
@@ -3940,7 +3940,7 @@ class tinyPStag extends HTMLElement {
             context.device.rawurl = 1;
             break;
         case "canvasurl":
-            console.log("adding canvasurlnode");
+            console.log("Adding canvasurlnode");
             othernode = document.createElement("CANVAS");
             othernode.id = "canvas" + this.id;
             othernode.className = "jscanvas";
@@ -3955,7 +3955,7 @@ class tinyPStag extends HTMLElement {
             context.device.canvasurl = 1;
             break;
         case "svg":
-            console.log("adding svgnode");
+            console.log("Adding svgnode");
             node = document.createElement("SVG");
             node.id = "svg" + this.id;
             node.className = "jssvg";
@@ -3966,7 +3966,7 @@ class tinyPStag extends HTMLElement {
             context.device.svg = 1;
             break;
         case "svgurl":
-            console.log("adding svgurlnode");
+            console.log("Adding svgurlnode");
             othernode = document.createElement("SVG");
             othernode.id = "svg" + this.id;
             othernode.className = "jssvg";
@@ -3982,7 +3982,7 @@ class tinyPStag extends HTMLElement {
             context.device.svgurl = 1;
             break;
         case "pdf":
-            console.log("adding pdfnode");
+            console.log("Adding pdfnode");
             node = document.createElement("IMG");
             node.id = "pdf" + this.id;
             node.style.display = "block";
@@ -3992,7 +3992,7 @@ class tinyPStag extends HTMLElement {
             context.device.pdf = 1;
             break;
         case "pdfurl":
-            console.log("adding pdfurlnode");
+            console.log("Adding pdfurlnode");
             node = document.createElement("IMG");
             node.id = "pdf" + this.id;
             node.style.display = "none";
@@ -4007,7 +4007,7 @@ class tinyPStag extends HTMLElement {
             break;
         case "canvas":
         default:
-            console.log("adding canvasnode");
+            console.log("Adding canvasnode");
             node = document.createElement("CANVAS");
             node.id = "canvas" + this.id;
             node.className = "jscanvas";
@@ -4028,8 +4028,8 @@ class tinyPStag extends HTMLElement {
     context = rpn(this.innerHTML, context, true);
     if (context.lasterror) {
         console.error("!" + context.lasterror);
-        console.log(context.stack.reduce((acc,v) => acc + v.dump + " " , " "));
-        console.log(context.currentcode);
+        console.log("Stack: " + context.stack.reduce((acc,v) => acc + v.dump + " " , " "));
+        console.log("Code executed: " + context.currentcode);
     }
     
   }
