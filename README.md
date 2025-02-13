@@ -44,6 +44,21 @@ will display as
 
 ![PS-46](https://github.com/user-attachments/assets/a6e64d9e-df92-4a52-857f-e9ad1b5f661b)
 
+More examples here: http://belle-nuit.com/site/files/minimal14.html
+
+## Node attributes
+
+The node has the following attributes. Changing them will be reflected by the browser.
+
+- width
+- height
+- format (canvas as default, pdf (currently Safari only), raw, svg comme image, canvasurl, pdfurl, rawurl, svgurl as downloadable link)
+- transparent (0 as default, except PDF which is always white paper)
+- oversampling (1 as default, 2 improves detail for raw)
+- interval (0 as default, in msec). You can have multiple pages which will be displayed by this delay.
+
+The node displays as block by default, but you can set it to inline-block with the CSS
+
 ## The PostScript language
 
 It is not the place here to make a tutorial of the PostScript language. 
