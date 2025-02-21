@@ -93,6 +93,8 @@ The sytax is shown as this: On the left of the operastor the expected values in 
 
 ### Math
 
+a ***abs*** number
+
 a b **add** number
 
 denum num **atan** number (returns angle of a slope)
@@ -103,15 +105,23 @@ a b **div** number
 
 a b **idiv** number
 
+a b **max*** number
+
+a b ***min*** number
+
 a b **mod** number
 
 a b **mul** number
 
 a **neg** -a
 
+***rand*** (between 0 and pow(2,31))
+
 a **round** a
 
 a **sin** number
+
+a ***sqrt*** number
 
 a b **sub** number
 
@@ -262,6 +272,8 @@ array n any **put**
 array start length any **putinterval**
 
 ## Stack
+
+***clear***
 
 **count** number (stack depth)
 
