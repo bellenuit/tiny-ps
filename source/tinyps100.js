@@ -1,7 +1,8 @@
 /* tiny-ps 
 	
 tiny-ps web component to display PostScript graphics inside HTML
-Version 1,0.0 2025-02-12 
+Version 1.0.0 2025-02-12
+Version 1.0.1 2025-02-21 added operators abs, clear, max, min, rand, sqrt
 
 Renders as subset PostScript to Canvas, SVG and PDF (as well as an obsucre raw rendering).
 The output can be displayed or proposed as downloadable link. It can be transparent.
@@ -338,7 +339,7 @@ rpnRawDevice = class {
             const url = canvas.toDataURL();
             this.urlnode.href = url;
             this.urlnode.setAttribute("download", "PS.png");
-            context.shadow.innerHTML = this.urlnode.outerHTML;
+            if (context.shadow) context.shadow.innerHTML = this.urlnode.outerHTML;
         } else {
             if (this.urlnode)  this.urlnode.style.display = "none";
         }
@@ -773,9 +774,11 @@ rpnSVGDevice = class {
         this.finalround = true;
     }
     refresh() {
+        if (this.node.style.display == "block") {
         this.node.style.display='none';
         this.node.offsetHeight;
         this.node.style.display='block';
+        }
         // https://martinwolf.org/before-2018/blog/2014/06/force-repaint-of-an-element-with-javascript/
     }
     clear(width, height, oversampling, transparent) {
@@ -1431,6 +1434,17 @@ rpnUnitTest("(ab(abc)","!syntaxerror");
 rpnUnitTest("(ab)abc)","(ab) !syntaxerror");
 rpnUnitTest("[(abc) 2 3 [4 5]]","[(abc) 2 3 [4 5]]");
 
+rpnOperators.abs = function(context) {
+    const [a] = context.pop("number");
+    if (!a) return context;
+    context.stack.push(new rpnNumber(Math.abs(a.value)));
+    return context;
+};
+rpnUnitTest("2 abs","2");
+rpnUnitTest("-2 abs","2");
+rpnUnitTest("(2) abs","!typeerror");
+rpnUnitTest("abs","!stackunderflow");
+
 rpnOperators.add = function(context) {
     const [b, a] = context.pop("number", "number");
     if (!b) return context;
@@ -1536,13 +1550,6 @@ rpnOperators.arcto = function(context) {
     return context;
 };
 
-rpnOperators.atan = function(context) {
-    const [denum, num] = context.pop("number","number");
-    if (!num) return context;
-    context.stack.push(new rpnNumber(Math.atan2(num.value,denum.value) * 180 / 3.1415926536 ));
-    return context;
-};
-
 rpnOperators.array = function(context) {
     const [n] = context.pop("number");
     if (!n) return context;
@@ -1556,14 +1563,24 @@ rpnOperators.array = function(context) {
     }
     context.stack.push(new rpnArray(a, context.heap));
     return context;
-};rpnUnitTest("3 array","[0 0 0]");
+};
+rpnUnitTest("3 array","[0 0 0]");
 rpnUnitTest("-3 array","!limitcheck");
 rpnUnitTest("0 array","!limitcheck");
 rpnUnitTest("array","!stackunderflow");
 
+
+rpnOperators.atan = function(context) {
+    const [denum, num] = context.pop("number","number");
+    if (!num) return context;
+    context.stack.push(new rpnNumber(Math.atan2(num.value,denum.value) * 180 / 3.1415926536 ));
+    return context;
+};
+
 rpnUnitTest("100 atan","100 !stackunderflow");
 rpnUnitTest("(a) 100 atan","!typeerror");
 rpnUnitTest("atan","!stackunderflow");
+
 
 rpnOperators.begin = function(context) {
     const [d] = context.pop("dictionary");
@@ -1598,6 +1615,10 @@ rpnOperators.charpath = function(context) {
     context = rpn(ps, context);
     return context;
 };
+
+rpnOperators.clear = function(context) {
+    context.stack = [];
+    return context;};
 
 rpnOperators.clip = function(context) {
     context.graphics.clip.push(context.graphics.path.slice());
@@ -1693,15 +1714,16 @@ rpnOperators.currentmatrix = function(context) {
 rpnUnitTest("currentmatrix","[1 0 0 1 0 0]");
 
 rpnOperators.currentpoint = function(context) {
+    if (!context.graphics.current.length) {
+       context.stack.push(new rpnError("nocurrentpoint"));
+       return context;
+    }
     const [x, y] = context.itransform(context.graphics.current[0], context.graphics.current[1]);
     context.stack.push(new rpnNumber(x));
-;
-
     context.stack.push(new rpnNumber(y));
-;
-
     return context;
 };
+
 rpnOperators.currentrgbcolor= function(context) {
     const [r, g, b] = context.graphics.color;
     context.stack.push(new rpnNumber(r.value/255.0));
@@ -1728,12 +1750,9 @@ rpnOperators.curveto = function(context) {
     }
     return context;
 };
-
-// rpnUnitTest requires moveto, moved there
 rpnUnitTest("100 90 50 90 50 50 curveto","!nocurrentpoint");
 rpnUnitTest("(a) 100 90 50 90 50 curveto","!typeerror");
 rpnUnitTest("100 90 50 90 50 curveto","100 90 50 90 50 !stackunderflow");
-
 
 rpnOperators.def = function(context) {
     const [b, a] = context.pop("any", "name");
@@ -2224,6 +2243,20 @@ rpnUnitTest("(a) 2 lt","!typeerror");
 rpnUnitTest("2 lt","2 !stackunderflow");
 rpnUnitTest("lt","!stackunderflow");
 
+rpnOperators.max = function(context) {
+    const [b, a] = context.pop("number", "number");
+    if (!b) return context;
+    context.stack.push(new rpnNumber(Math.max(a.value,b.value)));
+    return context;
+};
+
+rpnOperators.min = function(context) {
+    const [b, a] = context.pop("number", "number");
+    if (!b) return context;
+    context.stack.push(new rpnNumber(Math.min(a.value,b.value)));
+    return context;
+};
+
 rpnOperators.mod = function(context) {
     const [b, a] = context.pop("number", "number");
     if (!b) return context;
@@ -2418,6 +2451,11 @@ rpnOperators.qcurveto = function(context) {
     return context;
 };
 
+rpnOperators.rand = function(context) {
+	// range 0 - 2 exp 31, divide by 2147483648 to get range 0-1
+	context.stack.push(new rpnNumber(Math.random()*2147483648));
+	return context;
+}
 
 rpnOperators.rcurveto = function(context) {
     const [y3, x3, y2, x2, y1, x1] = context.pop("number","number","number","number","number","number");
@@ -2789,6 +2827,13 @@ rpnUnitTest("0 sin","0");
 rpnUnitTest("-30 sin","-0.5");
 rpnUnitTest("(a) sin","!typeerror");
 rpnUnitTest("sin","!stackunderflow");
+
+rpnOperators.sqrt = function(context) {
+    const [a] = context.pop("number");
+    if (!a) return context;
+    context.stack.push(new rpnNumber(Math.sqrt(a.value)));
+    return context;
+};
 
 rpnOperators.string = function(context) {
     const [n] = context.pop("number");
