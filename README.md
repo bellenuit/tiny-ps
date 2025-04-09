@@ -56,6 +56,7 @@ The node has the following attributes. Changing them will be reflected by the br
 - transparent (0 as default, except PDF which is always white paper)
 - oversampling (1 as default, 2 improves detail for raw)
 - interval (0 as default, in msec). You can have multiple pages which will be displayed by this delay.
+- error (show errors)
 
 The node displays as block by default, but you can set it to inline-block with the CSS
 
@@ -105,9 +106,13 @@ a b **div** number
 
 a b **idiv** number
 
-a b **max*** number
+a b **exp** number
 
-a b ***min*** number
+a **max** number (log base 10)
+
+a b **max** number
+
+a b **min** number
 
 a b **mod** number
 
@@ -115,13 +120,13 @@ a b **mul** number
 
 a **neg** -a
 
-***rand*** (between 0 and pow(2,31))
+**rand** (between 0 and pow(2,31))
 
 a **round** a
 
 a **sin** number
 
-a ***sqrt*** number
+a **sqrt** number
 
 a b **sub** number
 
@@ -207,9 +212,11 @@ arrayof6 **setmatrix**
 
 ### Text
 
-string **charpath***
+string **charpath**
 
-fontdictonary name **definefont*** 
+any **cvs** strinng (convert to string)
+
+fontdictonary name **definefont** 
 
 name **findfont** fontdictonary
 
@@ -273,7 +280,7 @@ array start length any **putinterval**
 
 ## Stack
 
-***clear***
+**clear**
 
 **count** number (stack depth)
 
@@ -291,7 +298,7 @@ a..i a b **roll** a..i (rolled stack)
 
 dict **begin** (push the dictionary on the dictionary stack, making it the current dictionary)
 
-**currentdict*** dict 
+**currentdict** dict 
 
 name any **def**
 
