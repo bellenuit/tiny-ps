@@ -2231,7 +2231,7 @@ rpnUnitTest("1 lineto","1 !stackunderflow");
 rpnUnitTest("lineto","!stackunderflow");
 
 
-pnOperators.log = function(context) {
+rpnOperators.log = function(context) {
     const [n] = context.pop("number");
     if (!n) return context;
     const result = Math.log10(n.value)
