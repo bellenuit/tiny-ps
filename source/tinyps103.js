@@ -1916,7 +1916,7 @@ rpnOperators.findfont = function(context) {
         return context;
     }
     if (rpnFonts[n.value].error) {
-        context.error("invalidfont " + fonts[n.value].error );
+        context.error("invalidfont " + rpnFonts[n.value].error );
         return context;
     }
     const dict = new rpnDictionary(1);
