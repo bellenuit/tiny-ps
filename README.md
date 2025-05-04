@@ -18,7 +18,7 @@ Programmable means also that is suited for dynamic content, database driven layo
 
 ## Installation
 
-Download the source file *tinyps100.js* and include it in your webpage. 
+Download the source file *tinyps104.js* and include it in your webpage. 
 If you want to use it to render text, you may also want to install TrueType fonts from the same folder or your own fonts.
 
 ## First example
