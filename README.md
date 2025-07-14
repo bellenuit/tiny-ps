@@ -194,6 +194,8 @@ x y **moveto**
 
 **newpath**
 
+**pathbbox** left bottom right top 
+
 qx qy x y **qcurveto** (quadratic)
 
 bx by cx cy x y **rcurveto** (bezier)
@@ -327,6 +329,8 @@ procedure **exec**
 **exit** (exit current loop)
 
 initial imncrement limit procedure **for**
+
+array procedure **forall**
 
 procedure condition **if**
 
