@@ -698,7 +698,7 @@ rpnSVGDevice = class {
         this.node.setAttribute("width", width + "px");
         this.node.setAttribute("height", height + "px");
         if (transparent) {
-        	this.node.setAttribute("style", "backgrouncolor: transparent");
+        	this.node.setAttribute("style", "backgrouncolor: none");
         } else {
         	        	this.node.setAttribute("style", "backgrouncolor: white");
         }
@@ -728,7 +728,7 @@ rpnSVGDevice = class {
                 }
            }
         } 
-        if (close) p.push("Z");
+        if (close && p.length && p[p.length-1] !== "Z") p.push("Z");
         return p.join(" ");
     }
     clip(context) {
@@ -740,7 +740,7 @@ rpnSVGDevice = class {
         for (let clip of context.graphics.clip) {
             const node = rpnDocument.createElement("clippath");
             if (this.clippath) node.setAttribute("clip-path", "url(#"+this.clippath+")");
-            this.clippath = "clippath"+this.node.childElementCount;
+            this.clippath = "clippath"+Math.round(Math.random()*1000000);
             node.setAttribute("id", this.clippath);
             const node2 = rpnDocument.createElement("path");
             node2.setAttribute("d", this.getPath(clip));
@@ -754,10 +754,10 @@ rpnSVGDevice = class {
         return this.fill(context, false);
     }
     fill(context, zerowind = true) {
-	    if (context.showmode) return context;
+	    if (context.showmode && context.device.textmode) return context;
 	    context = this.clip(context);
         const node = rpnDocument.createElement("path");
-        // node.setAttribute("id","fill"+this.node.childElementCount);
+        node.setAttribute("id","fill"+Math.round(Math.random()*1000000));
         node.setAttribute("d", this.getPath(context.graphics.path));
         node.setAttribute("stroke","none");
         node.setAttribute("fill", "rgb(" + Math.round(context.graphics.color[0]) + ", " + Math.round(context.graphics.color[1]) + ", " + Math.round(context.graphics.color[2]) + ")");
@@ -774,7 +774,7 @@ rpnSVGDevice = class {
     stroke(context) {
         context = this.clip(context);
         const node = rpnDocument.createElement("path");
-        node.setAttribute("id","stroke" + this.node.childElementCount);
+        node.setAttribute("id","stroke" + Math.round(Math.random()*1000000));
         node.setAttribute("d", this.getPath(context.graphics.path, false));
         node.setAttribute("fill","none");
         node.setAttribute("stroke-width",context.graphics.linewidth);
