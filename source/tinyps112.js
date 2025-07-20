@@ -15,6 +15,12 @@ Version 1.1.1 2025-07-14 new operators forall, pathbbox
 - fixed errors that did not stop code (always return with context.error!) 
 - fixed heap errors on arrays ans strings
 - download elements  with jtimestamp in filename
+Version 1.1.2 2025-07-20 new operators selectfont 
+- rpnFontURLs replaces fontpaths (URLs works both for https and data protocol)
+- added white background rect on non transparent SVG
+- added graphics, dictionary and device to console.log on errors
+- fixed font substitution for PDF and added Nimbus fonts
+- fixed PNG height
 
 Renders as subset PostScript to Canvas, SVG and PDF (as well as an obsucre raw rendering).
 The output can be displayed or proposed as downloadable link. It can be transparent.
