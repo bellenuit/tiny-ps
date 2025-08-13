@@ -56,11 +56,14 @@ The node has the following attributes. Changing them will be reflected by the br
 
 - width
 - height
-- format (canvas as default, pdf (currently Safari only), raw, svg comme image, canvasurl, pdfurl, rawurl, svgurl as downloadable link)
+- format (canvas as default, pdf (currently Safari only), raw, svg comme image, canvasurl, pdfurl, rawurl, svgurl as downloadable link, use comma separated list for multiple formats)
 - transparent (0 as default, except PDF which is always white paper)
 - oversampling (1 as default, 2 improves detail for raw)
 - interval (0 as default, in msec). You can have multiple pages which will be displayed by this delay.
-- error (show errors)
+- movie (0 as default, 1 as option to export multiple pages as MJPEG movie when canvasurl is format)
+- zip (0 as default, 1 as option to export multiple pages as ZIP collection of PNG when canvasurl is format)
+- svgmovie (0 as default, 1 as option to export multiple pages as animated SVG when svgurl is format)
+- error (0 as default, 1 as show errors)
 
 The node displays as block by default, but you can set it to inline-block with the CSS
 
@@ -240,6 +243,8 @@ fontdictonary n **scalefont** fontdictonary
 
 source seek **search** foundstring
 
+fontdictonary n **selectfont** 
+
 wx wy llx lly urx ury **setcachedevice**
 
 fontdictionary **setfont**
@@ -344,7 +349,7 @@ file **run** (is not actually reading a file. string of file must be bound for u
 
 ### Device
 
-dictionary **setpagedevice** (possible keys: canvas, canvasurl, color, console, height, oversampling, interval, pdf, pdfurl, raw, rswurl, svg, svgurl, textmode, transparent, width, height)
+dictionary **setpagedevice** (possible keys: canvas, canvasurl, color, console, height, movie, oversampling, interval, pdf, pdfurl, raw, rswurl, svg, svgmovie, svgurl, textmode, transparent, width, zip)
 
 **showpage** (don't forget that one)
 
@@ -389,6 +394,14 @@ If your code has error, the processor will stop and error will be shown in the B
 - Error type: **!typeerror** **!stackunderflow** **!stackunderflow** 
 - Current stack
 - Read trail until error (note that this code may have been expanded during execution)
+
+
+## Movies
+
+You can export multiple pages as movie (option movie) or animated SVG (svgmovie). The movie is encoded as MJPEG MP4 movie in double resolution. The compression is not very effective, but ok for social networks. If you want good comnpression (H.264) and full (four time) resolution, use ffmpeg to convert the PNG in the ZIP to MP4.
+
+<script>unzip PS__.zip
+ffmpeg -i PS__/ PS.mp4</script>
 
 
 ## Bugs
