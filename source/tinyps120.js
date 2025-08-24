@@ -65,14 +65,22 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 
 var ENVIRONMENT_IS_WORKER = typeof importScripts === 'function';
 
-rpnFontURLs = {};
+if (typeof rpnFontURLs  === 'undefined') {
+	console.log("fonts not defined");
+	rpnFontURLs = {};
+}
+if (typeof rpnOperators  === 'undefined') {
+	rpnOperators = {};
+}
+if (typeof rpnExtensions  === 'undefined') {
+	rpnExtensions = "";
+}
+
 rpnFonts = {};
 rpnFiles = {};
-rpnOperators = {};
 rpnFrames = {};
 rpnImageData = {};
 rpnSVGData = {};
-rpnExtensions = "";
 
 /* DATA TYPES */
 
