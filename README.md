@@ -52,7 +52,7 @@ will display as
 More examples here: https://belle-nuit.com/site/files/minimal14.html
 
 
-##Font paths
+## Font paths
 
 If you use fonts, you have to define the paths before.
 
