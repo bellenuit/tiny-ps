@@ -21,6 +21,7 @@ Programmable means also that is suited for dynamic content, database driven layo
 Download the source file *tinyps110.js* and include it in your webpage. 
 If you want to use it to render text, you may also want to install TrueType fonts from the same folder or your own fonts.
 
+
 ##Note
 
 Version 1.1 has been refactored as worker. This note does not reflect this change, though it should work out of the box.
@@ -49,6 +50,25 @@ will display as
 ![PS-46](https://github.com/user-attachments/assets/a6e64d9e-df92-4a52-857f-e9ad1b5f661b)
 
 More examples here: https://belle-nuit.com/site/files/minimal14.html
+
+
+##Font paths
+
+If you use fonts, you have to define the paths before.
+
+<html>
+    <head></head>
+    <body>
+        <tiny-ps id="ps" width="590" height="330" format="canvas">
+            /TGL017 30 selectfont
+            100 100 moveto (Hello World) show
+            showpage
+        </tiny-ps>
+        <script>rpnFontURLs = { TGL017: "path-to-folder/TGL017.ttf" } </script>
+        <script src = "source/tinyps100.js"></script>
+    </body>
+</html>
+
 
 ## Node attributes
 
