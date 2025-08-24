@@ -55,7 +55,7 @@ More examples here: https://belle-nuit.com/site/files/minimal14.html
 
 If you use fonts, you have to define the paths before.
 
-<html>
+```<html>
     <head></head>
     <body>
         <tiny-ps id="ps" width="590" height="330" format="canvas">
@@ -67,6 +67,7 @@ If you use fonts, you have to define the paths before.
         <script src = "source/tinyps100.js"></script>
     </body>
 </html>
+```
 
 
 ## Node attributes
