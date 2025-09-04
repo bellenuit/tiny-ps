@@ -27,6 +27,10 @@ Version 1.2.0 2025-08-13
 - export to MP4 movie (MJPEG) and animated SVG
 - smaller SVG (path 1/100, color hex and alpha)
 - new atttributes zip, movie (options for canvasurl) and svgmovie (option for svgurl)
+Version 1.2.1 2025-09-02
+- Fixed SVG viewbox
+- Fixed PNG size
+- operatir cvr
 
 Renders as subset PostScript to Canvas, SVG and PDF (as well as an obsucre raw rendering).
 The output can be displayed or proposed as downloadable link. It can be transparent.
@@ -4960,7 +4964,6 @@ class tinyPStag extends HTMLElement {
 				            shadow = node.shadowRoot; 
 							svgnode = shadow.querySelector('.divsvg');
 			                svgnode.innerHTML = data;
-			                console.log(node.style);
 							urlnode = shadow.querySelector('.svgurl');
 							if (urlnode) {
 								let file = rpnStartTag + "?xml version='1.0' encoding='UTF-8'?" + rpnEndTag + data;
