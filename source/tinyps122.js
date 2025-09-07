@@ -4694,8 +4694,8 @@ class tinyPStag extends HTMLElement {
     divnode.part = "output";
     divnode.style.height = "100%";
     divnode.style.width = "100%";
-    var divnurlode = document.createElement("DIV");
-    divnurlode.part = "url"
+    var divurlnode = document.createElement("DIV");
+    divurlnode.part = "url"
     var divsvgnode = document.createElement("DIV");
     divsvgnode.part = "divsvg"
     divsvgnode.className = "divsvg"
@@ -4705,7 +4705,7 @@ class tinyPStag extends HTMLElement {
     divsvgnode.style.height = "100%";
     divsvgnode.style.width = "100%";
     var othernode;
-    this.shadow.innerHTML = "";
+    // this.shadow.innerHTML = "";
     const formats = this.getAttribute("format").split(",");
     var errornode = document.createElement("DIV");
     errornode.part = "error"
@@ -4892,17 +4892,17 @@ class tinyPStag extends HTMLElement {
 	if (node2) divnode.appendChild(node2);
 	if (node3) { divsvgnode.appendChild(node3); divnode.appendChild(divsvgnode) }
 	if (node4) divnode.appendChild(node4);
-	if (urlnode) divnurlode.appendChild(urlnode);
-	if (urlnode2) divnurlode.appendChild(urlnode2);
-	if (urlnode2z) divnurlode.appendChild(urlnode2z);
-    if (urlnode2m) divnurlode.appendChild(urlnode2m);
-	if (urlnode3) divnurlode.appendChild(urlnode3);
-    if (urlnode3a) divnurlode.appendChild(urlnode3a);
-	if (urlnode4) divnurlode.appendChild(urlnode4);
+	if (urlnode) divurlnode.appendChild(urlnode);
+	if (urlnode2) divurlnode.appendChild(urlnode2);
+	if (urlnode2z) divurlnode.appendChild(urlnode2z);
+    if (urlnode2m) divurlnode.appendChild(urlnode2m);
+	if (urlnode3) divurlnode.appendChild(urlnode3);
+    if (urlnode3a) divurlnode.appendChild(urlnode3a);
+	if (urlnode4) divurlnode.appendChild(urlnode4);
 	
-    
+    while (this.shadow.lastChild) this.shadow.removeChild(this.shadow.lastChild);
     this.shadow.appendChild(divnode);
-    this.shadow.appendChild(divnurlode);
+    this.shadow.appendChild(divurlnode);
     this.shadow.appendChild(errornode);  
     
     const worker = rpnWorker(this.innerHTML, context);
