@@ -850,7 +850,7 @@ rpnSVGDevice = class {
         for (const font in this.fonts) {
             const style = rpnDocument.createElement("style");
             const url = rpnFontURLs[font];
-            const src = readSyncDataURL(url, "font/ttf");
+            const src = readSyncDataURL(url, "font/truetype");
             style.innerHTML = "@font-face { font-family: '" + font + "'; font-weight: normal; src:  url('" + src + "') format('truetype')} }";
             node.appendChild(style);
         }
@@ -4690,22 +4690,21 @@ class tinyPStag extends HTMLElement {
     context.device.svgmovie = this.getAttribute("svgmovie") ?? 0;
     context.device.zip = this.getAttribute("zip") ?? 0;
 	const errorMode = this.getAttribute("error") ?? 0;
-    var divnode = document.createElement("DIV");
+	var test = this.shadow.querySelector(".output");
+    var divnode = test ? test: document.createElement("DIV");
     divnode.part = "output";
+    divnode.className = "output";
     divnode.style.height = "100%";
     divnode.style.width = "100%";
     var divurlnode = document.createElement("DIV");
-    divurlnode.part = "url"
-    var divsvgnode = document.createElement("DIV");
+    divurlnode.part = "url";
+    test = this.shadow.querySelector(".divsvg");
+    var divsvgnode = test ? test : document.createElement("DIV");
     divsvgnode.part = "divsvg"
     divsvgnode.className = "divsvg"
-//     divsvgnode.style.width = context.width + "px";
-//     divsvgnode.style.height = context.height + "px";
-//    divsvgnode.style.backgroundColor = "white";
     divsvgnode.style.height = "100%";
     divsvgnode.style.width = "100%";
     var othernode;
-    // this.shadow.innerHTML = "";
     const formats = this.getAttribute("format").split(",");
     var errornode = document.createElement("DIV");
     errornode.part = "error"
@@ -4750,7 +4749,9 @@ class tinyPStag extends HTMLElement {
     }
     if (formats.indexOf("canvas") > -1 || formats.indexOf("canvasurl") > -1) {
         console.log("Adding canvasnode");
-        node2 = document.createElement("CANVAS");
+        
+        let test = divnode.querySelector(".jscanvas");
+        node2 = test ? test : document.createElement("CANVAS");
         node2.id = "canvas" + this.id;
         node2.part = "canvas";
         node2.className = "jscanvas";
@@ -4811,7 +4812,9 @@ class tinyPStag extends HTMLElement {
 	if (formats.indexOf("svg") > -1 || formats.indexOf("svgurl") > -1) {        
         console.log("Adding svgnode");
         // let svgdivnode = document.createElement("DIV");
-        node3 = document.createElement("SVG");
+        
+        let test = divnode.querySelector(".jssvg");
+        node3 = test ? test : document.createElement("SVG");
         node3.setAttribute("xmlns","http://www.w3.org/2000/svg"); // must be first attribute!
         node3.id = "svg" + this.id;
         node3.className = "jssvg";
@@ -4819,10 +4822,6 @@ class tinyPStag extends HTMLElement {
         node3.style.display = "none";
         node3.width = context.width;
         node3.height = context.height;
-//         node3.style.width = context.width + "px";
-// 		node3.style.height = context.height + "px";
-//         if (this.getAttribute("maxwidth"))
-//         	node3.style.maxWidth = this.getAttribute("maxwidth");
         context.device.svg = 1;
         
         if (formats.indexOf("svg") > -1)  {
@@ -4853,7 +4852,6 @@ class tinyPStag extends HTMLElement {
 	    } else {
 		    this.nodes.svg = node3;
 	    }
-	    //divnode.appendChild(svgdivnode);
 	}
 	
 	if (formats.indexOf("pdf") > -1 || formats.indexOf("pdfurl") > -1) {   
@@ -4970,10 +4968,8 @@ class tinyPStag extends HTMLElement {
 							
 			case "canvaszip": 	node = document.getElementById(id);
 				              	shadow = node.shadowRoot; 
-
-								if (context.device.zip) {
-									let urlnodez = shadow.querySelector('.jscanvasurlz');
-									rpnFrames[urlnodez.id].makeZip(urlnodez);
+							  	let urlnodez = shadow.querySelector('.jscanvasurlz');
+								if (context.device.zip && Object.keys(rpnFrames[urlnodez.id].zip).length > 1) { 																rpnFrames[urlnodez.id].makeZip(urlnodez);
 								    urlnodez.innerHTML = "ZIP";
 								    urlnodez.style.display = "inline";
 								}
@@ -5079,9 +5075,9 @@ class tinyPStag extends HTMLElement {
 			                node.setAttribute("width", data.width);
 			                node.setAttribute("height", data.height);
 			                node.parentNode.setAttribute("width", data.width);
-			                node.parentNode.setAttribute("height", data.height);
-			                node.parentNode.style.width = data.width + "px"; 
-			                node.parentNode.style.height = data.height + "px"; 
+			                node.parentNode.setAttribute("height", data.height + 20);
+			                node.parentNode.style.width = (data.width) + "px"; 
+			                node.parentNode.style.height = (data.height + 20) + "px"; 
 			                shadow = node.shadowRoot; 
 							svgnode = shadow.querySelector('.divsvg');
 							if (svgnode) {
