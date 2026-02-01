@@ -40,7 +40,7 @@ Version 1.1 has been refactored as worker. This note does not reflect this chang
 0.0 setgray 280 180 triangle stroke
 showpage
         </tiny-ps>
-        <script src = "source/tinyps100.js"></script>
+        <script src = "source/tinyps124.js"></script>
     </body>
 </html>
 ```
@@ -49,7 +49,7 @@ will display as
 
 ![PS-46](https://github.com/user-attachments/assets/a6e64d9e-df92-4a52-857f-e9ad1b5f661b)
 
-More examples here: https://belle-nuit.com/site/files/minimal14.html
+More examples here: https://belle-nuit.com/site/files/minimal15.html
 
 ## Font paths
 
@@ -64,8 +64,8 @@ If you use fonts, you have to define the paths before.
             100 100 moveto (Hello World) show
             showpage
         </tiny-ps>
-        <script>rpnFontURLs = { TGL017: "path-to-folder/TGL017.ttf" } </script>
-        <script src = "source/tinyps100.js"></script>
+        <script>rpnFontURLs = { TGL017: "../source/TGL017.ttf" } </script>
+        <script src = "../source/tinyps124.js"></script>
     </body>
 </html>
 ```
@@ -202,6 +202,8 @@ x1 y1 x2 y2 r **arcto** (for rounded rectangles)
 
 **currentpoint** x y
 
+**currentpointexists** boolean (non standard)
+
 **currentrgbcolor** r g b (between 0 and 1)
 
 bx by cx cy x y **curveto** (bezier)
@@ -270,6 +272,8 @@ wx wy llx lly urx ury **setcachedevice**
 
 fontdictionary **setfont**
 
+wx wy llx lly urx ury **setcachedevice**
+
 string **show** x y (needs moveto to set initial position)
 
 n **string** string
@@ -297,6 +301,8 @@ x y **transform** x0 y0 (from user space to device space)
 x y **translate** 
 
 ### Array
+
+array **aload** a1..an array
 
 n **array** array (an empty array of n elements, PostScript is from a time of limited memory)
 
@@ -341,6 +347,8 @@ n **dict** dict
 dictionary name **get** value
 
 dictionary key **known** boolean
+
+name **load** value
 
 dict **readonly** (stub not implemented)
 
