@@ -378,6 +378,8 @@ file **run** (is not actually reading a file. string of file must be bound for u
 
 ### Device
 
+**currentpagedevice** dictionaray
+
 dictionary **setpagedevice** (possible keys: canvas, canvasurl, color, console, height, movie, oversampling, interval, pdf, pdfurl, raw, rswurl, svg, svgmovie, svgurl, textmode, transparent, width, zip)
 
 **showpage** (don't forget that one)
