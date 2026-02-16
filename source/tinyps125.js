@@ -180,6 +180,12 @@ rpnDictionary = class {
        }
        return dict;
   }
+  fromDict(dict) {
+	  for (let key in dict) {
+           const v = dict[key];
+           this.value[key] = v;
+       }
+  }
 };
 
 rpnError = class {
@@ -978,6 +984,7 @@ rpn = function(s, context = null, outerContext = false, silent = false ) {
     if (!context) {
         context = new rpnContext();
     }
+    if (!s) return context;
     context.silent = silent;
     context.livestatus = false;
     if (s.slice(0,1)=="!") {
@@ -1018,7 +1025,7 @@ rpn = function(s, context = null, outerContext = false, silent = false ) {
                 if (/[0-9-.]/.test(elem)) {
                     state = "number";
                     current = elem;
-                } else if (/[a-zA-Z]/.test(elem)) {
+                } else if (/[a-zA-Z_]/.test(elem)) {
                     state = "operator";
                     current = elem;
                 }  else if (elem == "/") {
@@ -1085,7 +1092,7 @@ rpn = function(s, context = null, outerContext = false, silent = false ) {
                }
                break;
             case "operator":
-                if (/[a-zA-Z0-9]/.test(elem)) {
+                if (/[a-zA-Z0-9_.]/.test(elem)) {
                     current += elem;
                 } else if (elem.trim() !== "" && elem != "]"){
                     context.error("syntaxerror");
@@ -1126,7 +1133,7 @@ rpn = function(s, context = null, outerContext = false, silent = false ) {
                 }
                 break;
            case "namestart":
-                if (/[a-zA-Z.]/.test(elem)) {
+                if (/[a-zA-Z._]/.test(elem)) {
                     state = "name";
                     current = elem;
                 } else {
@@ -1134,7 +1141,7 @@ rpn = function(s, context = null, outerContext = false, silent = false ) {
                 }
                 break;
             case "name":
-                if (/[a-zA-Z0-9-.]/.test(elem)) {
+                if (/[a-zA-Z0-9-_.]/.test(elem)) {
                     current += elem;
                 } else if (elem.trim() === "") {
                     context.stack.push(new rpnName(current));
@@ -1599,11 +1606,18 @@ rpnOperators.charpath = function(context) {
 
 rpnOperators.clear = function(context) {
     context.stack = [];
-    return context;};
+    return context;
+};
 
 rpnOperators.clip = function(context) {
     context.graphics.clip.push(context.graphics.path.slice());
-    return context;};
+    return context;
+};
+    
+rpnOperators.clippath = function(context) {
+    context.graphics.path = context.graphics.clip.slice();
+    return context;
+};
 
 rpnOperators.closepath = function(context) {
     if (!context.graphics.current.length) {
@@ -1664,6 +1678,12 @@ rpnOperators.count = function(context) {
 rpnOperators.currentalpha = function(context) {
     const a = context.graphics.color[3];
     context.stack.push(new rpnNumber(a.value/255.0));
+    return context;
+};
+
+rpnOperators.currentflat = function(context) {
+	// not implemented
+    context.stack.push(new rpnNumber(1));
     return context;
 };
 
@@ -2291,13 +2311,24 @@ rpnUnitTest("lineto","!stackunderflow");
 
 
 rpnOperators.load = function(context) {
-    const [a] = context.pop("name");
-    if (!a) return context;
-    const elem = context.dict[a.value];
-    if (elem) {
-        context.stack.push(elem);
+    const [key] = context.pop("name");
+    if (!key) return context;
+    var data = context.dict[key.value];
+	if (!data) {
+	    for (let i = context.dictstack.length - 1; i >= 0; i--) {
+	        data = context.dictstack[i][key.value];
+	        if (data) {
+	            i = 0; // break
+	        }
+	    }
+	}
+   if (!data) {
+	   data = new rpnProcedure(this.value)
+   }
+   if (data) {
+        context.stack.push(data);
     } else {
-       return context.error("undefined");
+       return context.error("undefined " + key.value);
     }
     return context;
 }; 
@@ -2651,6 +2682,14 @@ rpnUnitTest("3 2 { 4 add } repeat","11");
 rpnUnitTest("3 0 { 4 add } repeat","3");
 rpnUnitTest("3 -1 { 4 add } repeat","3");
 
+
+rpnOperators.restore = function(context) {
+	// partially implemented
+	const [vm] = context.pop("dictionary");
+	context.graphicsstack.push(vm.value);
+    return context;
+};
+
 rpnOperators.rlineto = function(context) {
     const [y, x] = context.pop("number","number");
     if (!y) return context;
@@ -2766,6 +2805,17 @@ rpnOperators.run = function(context) {
     return context;
 };
 
+rpnOperators.save = function(context) {
+	// partially implemented
+	const vm = rpnObjectSlice(context.graphicsstack[context.graphicsstack.length - 1]);
+    context.graphicsstack.push(vm);
+    const dict = new rpnDictionary(1);
+    dict.fromDict(vm);
+    context.stack.push(dict);
+    return context;
+};
+
+
 rpnOperators.scale = function(context) {
     const [y, x] = context.pop("number","number");
     if (!x) return context;
@@ -2788,10 +2838,6 @@ rpnOperators.scalefont = function(context) {
     return context;
 };
 
-rpnOperators.selectfont = function(context) {
-    const [scale, font] = context.pop("number","name");
-    return rpn("/" + font.value + " findfont " + scale.value + " scalefont setfont" , context);
-};
 
 rpnOperators.search = function(context) {
     const [seek, source] = context.pop("string", "string");
@@ -2813,6 +2859,12 @@ rpnOperators.search = function(context) {
     return context;
 };
 
+rpnOperators.selectfont = function(context) {
+    const [scale, font] = context.pop("number","name");
+    return rpn("/" + font.value + " findfont " + scale.value + " scalefont setfont" , context);
+};
+
+
 rpnOperators.setalpha = function(context) {
     const [a] = context.pop("number");
     if (!a) return context;
@@ -2828,9 +2880,22 @@ rpnOperators.setcachedevice = function(context) {
     return context;
 };
 
+rpnOperators.setdash = function(context) {
+    const [offset, motif] = context.pop("number", "array");
+    // not implemented
+    return context;
+};
+
 rpnOperators.setfont = function(context) {
     const [font] = context.pop("dictionary");
     context.graphics.font =  font.value.FontName.value;
+    return context;
+};
+
+rpnOperators.setflat = function(context) {
+    const [g] = context.pop("number");
+    if (!g) return context;
+    // not implemented
     return context;
 };
 
@@ -3112,6 +3177,31 @@ rpnUnitTest("true { 2 3 add } if","5");
 rpnUnitTest("true if","1 !stackunderflow");
 rpnUnitTest("true { 2 3 add } { 2 3 sub } ifelse","5");
 rpnUnitTest("true { 2 3 add } ifelse","1 { 2 3 add } !stackunderflow");rpnUnitTest("true ifelse","1 !stackunderflow");rpnUnitTest("true not","0");
+
+
+rpnOperators.where = function(context) {
+	const [k] = context.pop("name");
+    var data = context.dict[k.value];
+    var dict = context.dict;
+    if (!data) {
+	    for (let i = context.dictstack.length - 1; i >= 0; i--) {
+	        data = context.dictstack[i][k.value];
+	        dict = context.dictstack[i];
+	        if (data) {
+	            i = 0; // break
+	        }
+	    }
+	}
+	if (data) {
+		const rdict = new rpnDictionary(1);
+		rdict.fromDict(dict);
+		context.stack.push(rdict);
+		context.stack.push(new rpnNumber(1));
+	} else {
+		context.stack.push(new rpnNumber(0));
+	}
+	return context;
+}
 
 rpnOperators.widthshow = function(context) {
     const [s, ch, cy, cx ] = context.pop("string", "number", "number", "number");
