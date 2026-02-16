@@ -192,9 +192,13 @@ x1 y1 x2 y2 r **arcto** (for rounded rectangles)
 
 **clip** (clips the render region to the current path)
 
+***clippath***
+
 **closepath** (you need that to fill)
 
 **currentalpha** number (not native between 0 transparent and 1 opaque )
+
+**currentflat** number (only stub)
 
 **currentgray** number (between 0 black and 1 white)
 
@@ -231,6 +235,10 @@ x y **rlineto**
 x y **rmoveto**
 
 a **setalpha** (not native)
+
+array n ***setdash*** (only stub)
+
+n ***setflat*** (only stub)
 
 x **setgray** 
 
@@ -292,7 +300,11 @@ cx cy ch string **widthshow** x y (ch is space in Ascii code)
 
 x y **itransform** x0 y0 (from device space to user space)
 
+vm **restore** (only stub works like gsave-grestore with vm as gstate)
+
 angle **rotate**
+
+**save**  vm (only stub works like gsave-grestore with vm as gstate)
 
 x y **scale**
 
@@ -352,11 +364,14 @@ name **load** value
 
 dict **readonly** (stub not implemented)
 
+name **where** dict 1 
+name **where** 0
+
 ### Execution
 
 **bind** (stub not implemented)
 
-a..i n **copy*** a..i (n times)
+a..i n *copy** a..i (n times)
 
 procedure **exec**
 
