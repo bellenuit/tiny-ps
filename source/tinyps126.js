@@ -729,6 +729,7 @@ rpnPDFDevice = class {
 rpnSVGDevice = class {
     constructor() {
         this.canshow = true;
+        this.cannofill = true;
         this.fonts = {};
         this.clear( 640, 360, 1, 0);
     }
@@ -857,6 +858,10 @@ if (context.device.transparent)
             node.setAttribute("fill", this.rgba2hex(context.graphics.color[0], context.graphics.color[1], context.graphics.color[2], context.graphics.color[3]));
         else 
             node.setAttribute("fill", this.rgbahex(context.graphics.color[0], context.graphics.color[1], context.graphics.color[2]));
+        if (context.nofill) {
+        	node.setAttribute("fill","none");
+        	node.setAttribute("z","50");
+        }
         const matrix = context.graphics.matrix.slice();
         const decomposed = rpnDecompose2dMatrix(matrix);
         const x = context.graphics.current[0];
@@ -3037,6 +3042,15 @@ rpnOperators.show = function(context) {
     }
          if (!font) {
 	     return context.error("nocurrentfont");
+    }
+    else {
+	    for (let n of context.nodes) {
+           if (n.cannofill) {
+	           context.nofill = true;
+	           context = n.show(s.value, context);
+	           context.nofill = false;
+	       }
+        }
     }
 
         var ps = "";
