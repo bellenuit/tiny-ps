@@ -924,11 +924,9 @@ rpnSVGDevice = class {
 	        const font = rpnFonts[context.graphics.font];
 	        const fontid = Object.keys(rpnFonts).indexOf(context.graphics.font);
 	        let scale = context.graphics.size / font.head.unitsPerEm;
-	        let descent = font.hhea.descent / 2 * scale;  // vertical correction do not know why it's half descent
-
 	        const glyphtextnode = rpnDocument.createElement("g");
 	        glyphtextnode.setAttribute("text",s);
-            glyphtextnode.setAttribute("transform", "translate(" + (Math.round(x*1000)/1000) + " " + (Math.round((y+descent)*1000)/1000) +") scale(" + decomposed.scale[0]*scale + " " +  decomposed.scale[1]*scale  + ") rotate(" +  -decomposed.rotation*180/Math.PI + ")" );
+            glyphtextnode.setAttribute("transform", "translate(" + (Math.round(x*1000)/1000) + " " + (Math.round((y-context.height*scale)*1000)/1000) +") scale(" + decomposed.scale[0]*scale + " " +  decomposed.scale[1]*scale  + ") rotate(" +  -decomposed.rotation*180/Math.PI + ")" );
             if (context.device.transparent == 1)
             glyphtextnode.setAttribute("fill", this.rgba2hex(context.graphics.color[0], context.graphics.color[1], context.graphics.color[2], context.graphics.color[3]));
         else 
