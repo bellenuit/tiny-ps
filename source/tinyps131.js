@@ -1007,7 +1007,130 @@ rpnSVGDevice = class {
     	
   		const hex =  "#" + (1 << 24 | r << 16 | g << 8 | b ).toString(16).slice(1);
 
-  		return hex;
+        return hex;
+    }
+};
+
+ rpnGCODEDevice = class {
+    constructor() {
+        this.canshow = false;
+        this.cannofill = false;
+        this.clear( 640, 360, 1, 0);
+        this.currentcolor = {};
+    }
+    clear(width, height, oversampling, transparent) {
+        this.node = rpnDocument.createElement("TEXTAREA");
+        this.width = width;
+        this.height = height;       
+        this.node.setAttribute("width", width + "px");
+        this.node.setAttribute("height", height + "px");
+        this.oversampling = oversampling;
+        this.ctx = true;
+        this.lines = [];
+        this.lines.push("; GCODE creator TinyPS");
+        this.lines.push("; init");
+        this.lines.push("G21"); // mm units
+        this.lines.push("G92 X0 Y0"); // current position is 0,0
+        this.lines.push("F1500"); // current position is 0,0
+        this.lines.push("G0 Z0"); // pen up
+        this.color = [];
+    
+
+    }
+    finalize(context) {
+    	postMessage(["gcodefinal", context.id, null, null])
+    }
+    getPath(path, context, close = true) {
+       const p = [];
+       if (!path.length) return "";
+
+       function tf(p, dev) {
+           var [linetype, x0, y0, x, y] = p;
+           const precision = 10;
+           const point2mm = 25.4/96; // use modern scale
+// rpnLineIntersection = function(x1, y1, x2, y2, x3, y3, x4, y4)
+           if (x < 0) 
+               [x, y] = rpnLineIntersection(x0,y0,x,y,0,0,0,dev.height);
+           if (x >= dev.width)
+               [x, y] = rpnLineIntersection(x0,y0,x,y,dev.width-1,0,dev.width-1,dev.height);
+           if (y < 0) 
+               [x, y] = rpnLineIntersection(x0,y0,x,y,0,0,dev.width,0);
+           if (y >= dev.height)
+               [x, y] = rpnLineIntersection(x0,y0,x,y,0,dev.height-1,dev.width,dev.height-1);
+           const xlimited = Math.min(dev.width,Math.max(0,x)) ; 
+           const ylimited = Math.min(dev.height,Math.max(0,y)) ; 
+           const xscaled = Math.round(xlimited*point2mm*precision)/precision;        
+           const yscaled = Math.round(ylimited*point2mm*precision)/precision; 
+           return [xscaled,yscaled];       
+       }
+       
+       for (let subpath of path) {
+           if (!subpath.length) continue;
+
+
+           var x, y;
+
+           [x, y] = tf(["M",context.width/2,context.height/2,subpath[0][1],subpath[0][2]],context);
+
+           p.push(";");
+           p.push(`G0 X${ x } Y${ y  }`)
+           p.push("G0 Z8"); // pen down 
+
+
+           for (let line of subpath) {
+               if (line[0] == "C") {
+                   let bezierpath = rpnBezier(line);
+
+                   for (let bline of bezierpath) {
+                        [x, y] = tf(bline,context);
+                        p.push(`G1 X${ x } Y${ y  }`)
+                   }
+
+                } else {
+                        [x, y] = tf(line,context);
+                        p.push(`G1 X${ x } Y${ y  }`)
+                }
+           }
+          p.push("G0 Z0"); // pen up 
+        } 
+        return p;
+    }
+    clip(context) {
+        
+        // not supported
+       
+        return context;
+    }
+    eofill (context) {
+        // not supported
+        return context;
+    }
+    fill(context, zerowind = true) {
+	    // not supported
+        return context;
+    }
+    stroke(context) {
+        context = this.clip(context);
+        if (this.color.length && this.color.toString() !== context.graphics.color.toString()) {
+            this.lines.push(`; color changes from ${ this.color.toString()} to ${ context.graphics.color.toString()}`); 
+            this.lines.push("M06"); // tool change
+        }
+        this.color = context.graphics.color.slice();
+        const p = this.getPath(context.graphics.path, context, false);
+        for(let line of p) this.lines.push(line);
+        return context;
+    }
+    show(s, context, targetwidth = 0, cx=0, ch = 32) { 
+	    // not supported
+        return context;
+    }
+    showpage(context) {
+        this.lines.push("; clean up");
+        this.lines.push("G0 X0 Y0"); // go to origin       
+        this.lines.push("M2"); // end
+        postMessage(["gcode", context.id, this.lines, null])
+        this.clear(this.width, this.height, this.oversampling, this.transparent);
+        return context;
     }
 };
 
@@ -1030,7 +1153,7 @@ rpnContext = class {
         this.dictstack.push({});
         this.nodes = [];
         this.fontdict = {};
-        this.device = { canvas: 0, canvasurl: 0, console: 1, interval: 0, zip: 0, movie: 0, svgmovie: 0, oversampling: 1, pdf: 0, pdfurl: 0, raw: 0, rawurl : 0, svg: 0, svgurl: 0, textmode: 2,  transparent: 0, width: 640, height: 360 };
+        this.device = { canvas: 0, canvasurl: 0, console: 1, gcode: 0, gcodeurl: 1, interval: 0, zip: 0, movie: 0, svgmovie: 0, oversampling: 1, pdf: 0, pdfurl: 0, raw: 0, rawurl : 0, svg: 0, svgurl: 0, textmode: 2,  transparent: 0, width: 640, height: 360 };
         this.async = false;
         this.initgraphics();
     }
@@ -1858,6 +1981,8 @@ rpnOperators.currentpagedevice = function(context) {
 	d.value.canvasurl = new rpnNumber(context.dict.canvasurl ? 1 : 0);
 	d.value.color = new rpnNumber(context.dict.color ? 1 : 0);
 	d.value.console = new rpnNumber(context.dict.console ? 1 : 0);
+    d.value.gcode = new rpnNumber(context.dict.gcode ? 1 : 0);
+    d.value.gcodeurl = new rpnNumber(context.dict.gcodeurl ? 1 : 0);
     d.value.height = new rpnNumber(context.height);
     d.value.interval = new rpnNumber(context.dict.interval ? context.dict.interval : 0);
     d.value.oversampling = new rpnNumber(context.dict.oversampling ? context.dict.oversampling : 0);
@@ -2726,7 +2851,6 @@ rpnOperators.putinterval = function(context) {
     
     if (!a) return context;
     if (b.value < 0) return context.error("rangerror");
-
     if (b.value + c.value.length > a.value.length) return context.error("rangerror");
     if (a.type !== c.type) return context.error("typeerror");
     if (a.type == "array") {
@@ -3149,6 +3273,8 @@ rpnOperators.setpagedevice = function(context) {
     if (dict.canvasurl) context.device.canvasurl = dict.canvasurl.value;
     if (dict.color)  context.device.color = dict.color.value;
     if (dict.console)  context.device.console = dict.console.value;
+    if (dict.gcode) context.device.gcode = dict.gcode.value;
+    if (dict.gcodeurl) context.device.gcodeurl = dict.gcodeurl.value;
     if (dict.height) context.height = context.device.height = dict.height.value;
     if (dict.oversampling) {
         const oversampling = Math.min(16,Math.max(1, dict.oversampling.value));
@@ -5109,7 +5235,7 @@ class tinyPStag extends HTMLElement {
 	    errornode.className = "error";
 	    errornode.style.display = "none";
 	
-		var node, node2, node3, node4;
+		var node, node2, node3, node4, node5, urlnode5;
 		var urlnode, urlnode2, urlnode2m, urlnode2z, urlnode3, urlnode3a, urlnode4;
 	    
 	    if (formats.indexOf("raw") > -1 || formats.indexOf("rawurl") > -1) {
@@ -5234,6 +5360,7 @@ class tinyPStag extends HTMLElement {
 	            urlnode3.className = "svgurl";
 	            urlnode3.innerHTML = "SVG";
 	            urlnode3.style.display = "inline";
+                this.nodes.svgurl = urlnode3;
 	            if (context.device.svgmovie) {
 	            	urlnode3a = document.createElement("A");
 	            	urlnode3a.id = "svgurla" + this.id;
@@ -5242,10 +5369,11 @@ class tinyPStag extends HTMLElement {
 	            	urlnode3a.innerHTML = "A..";
 	            	urlnode3a.style.display = "none";
 	            	rpnSVGData[urlnode3a.id] = [];
+
 	            }
 	            this.nodes.svg = node3;
-	            this.nodes.svgurl = urlnode3;
-	            this.nodes.svgurl = urlnode3a;
+	            
+	           
 	            context.device.svgurl = 1;
 		    } else {
 			    this.nodes.svg = node3;
@@ -5284,17 +5412,55 @@ class tinyPStag extends HTMLElement {
 		    }
 		}
 		
+        if (formats.indexOf("gcode") > -1 || formats.indexOf("gcodeurl") > -1) {        
+            console.log("Adding gcodenode");
+            
+            let test = divnode.querySelector(".jsgcode");
+            node5 = test ? test : document.createElement("TEXTAREA");
+            node5.setAttribute("COLS","80");
+            node5.setAttribute("ROWS","30");
+            node5.id = "gcode" + this.id;
+            if (!test) node5.className = "jsgcode";
+            node5.part = "gcode";
+            node5.style.display = "none";
+            if (!test) node5.width = context.width;
+            if (!test) node5.height = context.height;
+            context.device.gcode = 1;
+            
+            if (formats.indexOf("gcode") > -1)  {
+                node5.style.display = "block";
+                node5.style.width = "100%";
+            }
+            
+            if (formats.indexOf("gcodeurl") > -1) { console.log("gcodeurl")
+                urlnode5 = document.createElement("A");
+                urlnode5.id = "gcodeurl" + this.id;
+                urlnode5.part = "gcodeurl";
+                urlnode5.className = "gcodeurl";
+                urlnode5.innerHTML = "GCODE";
+                urlnode5.style.display = "inline";
+                this.nodes.gcode = node5;
+                this.nodes.gcodeurl = urlnode5;
+                context.device.gcodeurl = 1;
+            } else {
+                this.nodes.gcode = node5;
+            }
+        }
+
+
 		if (node) divnode.appendChild(node);
 		if (node2) divnode.appendChild(node2);
 		if (node3) { divsvgnode.appendChild(node3); divnode.appendChild(divsvgnode) }
-		if (node4) divnode.appendChild(node4);
+        if (node4) divnode.appendChild(node4);
+        if (node5) divnode.appendChild(node5);
 		if (urlnode) divurlnode.appendChild(urlnode);
 		if (urlnode2) divurlnode.appendChild(urlnode2);
 		if (urlnode2z) divurlnode.appendChild(urlnode2z);
 	    if (urlnode2m) divurlnode.appendChild(urlnode2m);
 		if (urlnode3) divurlnode.appendChild(urlnode3);
 	    if (urlnode3a) divurlnode.appendChild(urlnode3a);
-		if (urlnode4) divurlnode.appendChild(urlnode4);
+        if (urlnode4) divurlnode.appendChild(urlnode4);
+        if (urlnode5) divurlnode.appendChild(urlnode5);
 		
 		
 	    // while (this.shadow.lastChild) this.shadow.removeChild(this.shadow.lastChild);
@@ -5314,7 +5480,7 @@ class tinyPStag extends HTMLElement {
 		}
 		const [ action, id, data, contextstring ] = msg;
 		
-		var node, shadow, canvasnode, svgnode, pdfnode, urlnode, urlnodea, ctx, url, errornode;
+		var node, shadow, canvasnode, gcodenode, svgnode, pdfnode, urlnode, urlnodea, ctx, url, errornode;
 		
 		// console.log("worker out: " + action + " " + id);
 		switch (action)
@@ -5460,8 +5626,36 @@ class tinyPStag extends HTMLElement {
                                 urlnodea.setAttribute("download", fn);
 						        urlnodea.innerHTML = "ASVG";
 						        urlnodea.style.display = "inline";
-							}}				            
-											            break;
+							}}		 		            
+							break;
+
+            case "gcode":   node = document.getElementById(id); console.log("gcode");
+                            shadow = node.shadowRoot; 
+                            gcodenode = shadow.querySelector('.jsgcode');
+                            if (gcodenode) {
+                                gcodenode.innerHTML = data.join("\n");
+                                urlnode = shadow.querySelector('.gcodeurl');
+                                if (urlnode) { console.log("gcodeurl setting")
+                                    let file =  data.join("\n");
+                                    url = "data:text/x-gcode;base64," + rpnBbtoaUnicode(file);
+                                    urlnode.href = url;
+                                    let d = new Date();
+                                    let fn = "PS" + '_'+d.toISOString().replaceAll("-","").replaceAll(":","").replaceAll("T","_").substr(0,13)+".gcode";
+                                    urlnode.setAttribute("download", fn);
+                                }
+                            }
+                            break;
+            
+            
+            case "gcodefinal": node = document.getElementById(id);
+                            shadow = node.shadowRoot; 
+                            gcodenode = shadow.querySelector('.jsgcode');
+                            if (gcodenode)
+                                gcodenode.outerHTML = gcodenode.outerHTML + " ";
+                           
+                                               
+                             break;
+
 			
 			case "pdf":     node = document.getElementById(id);
 				            shadow = node.shadowRoot; 
@@ -5563,6 +5757,9 @@ workeronmessage = function (e) {
 		if(context.device.pdf || context.device.pdfurl) {
 		context.nodes.push(new rpnPDFDevice());
 	}
+    if(context.device.gcode || context.device.gcodeurl) {
+        context.nodes.push(new rpnGCODEDevice());
+    }
 
 	context.id = id;
 	
@@ -5622,6 +5819,7 @@ function rpnWorker() {
 	workercode.push('rpnCanvasDevice = ' + rpnCanvasDevice.toString());
 	workercode.push('rpnPDFDevice = ' + rpnPDFDevice.toString());
 	workercode.push('rpnSVGDevice = ' + rpnSVGDevice.toString());
+    workercode.push('rpnGCODEDevice = ' + rpnGCODEDevice.toString());
 	workercode.push('rpnContext = ' + rpnContext.toString()); 
 	workercode.push('rpn = ' + rpn.toString());
 	workercode.push('rpnBezier = ' + rpnBezier.toString());
@@ -5660,8 +5858,10 @@ rpnDocument = new xmlDoc();
 	{
 		workercode.push('rpnOperators.' + key + ' = ' + rpnOperators[key].toString());
 	}
-	const baseURL = location.origin + ((location.pathname.substr(0,1)=="/") ? "" : "/") + location.pathname.split("/").slice(0,-1).join("/")+"/";
-	console.log(baseURL)
+    const origin = (location.origin === null || location.origin == "null") ? "file://" : location.origin ;
+	const baseURL = origin + ((location.pathname.substr(0,1)=="/") ? "" : "/") + location.pathname.split("/").slice(0,-1).join("/")+"/";
+	// console.log(origin);
+    // console.log(baseURL);
 	workercode.push('rpnBaseURL = ' + '"' + baseURL + '"');
 	workercode.push('rpnFontURLs = {};');
 	for (key in rpnFontURLs)
