@@ -117,7 +117,7 @@ rpnSVGData = {};
 /* DATA TYPES */
 
 rpnHeapElement = class {
-    constructor(x, type, heap) {
+    constructor(x, type, heap) {     // console.log("heap* " + heap);
        this.value = x;
        this.type = type;
        this.counter = 0;
@@ -241,7 +241,7 @@ rpnProcedure = class {
 rpnString = class {
    constructor(x, heap) {
       if (typeof x != "string") throw "nostring";
-      this.reference = new rpnHeapElement(x, "array", heap);
+      this.reference = new rpnHeapElement(x, "string", heap);
    }
    get type() { return "string"; }
    get dump() { return "(" + this.value + ")"; }
@@ -876,7 +876,7 @@ rpnSVGDevice = class {
             node.setAttribute("stroke", this.rgb2hex(context.graphics.color[0], context.graphics.color[1], context.graphics.color[2]));
         if (this.clippath) node.setAttribute("clip-path", "url(#"+this.clippath+")");
         this.node.appendChild(node);
-        console.log(node.innerHTML);
+        // console.log(node.innerHTML);
         return context;
     }
     show(s, context, targetwidth = 0, cx=0, ch = 32) { 
@@ -1947,8 +1947,9 @@ rpnOperators.cvr = function(context) {
 rpnOperators.cvs = function(context) {
     const [x] = context.pop("any");
     if (!x) return context;
-    const result = x.dump
-    context.stack.push(new rpnString(result, context.heap));
+    const result = new rpnString(x.dump, context.heap);
+    result.reference.inc();
+    context.stack.push(result);
     return context;
 };
 
@@ -2718,11 +2719,16 @@ rpnOperators.put = function(context) {
 };
 
 rpnOperators.putinterval = function(context) {
+
     const [c, b, a] = context.pop("string,array", "number", "array,string");
+    
+    // postMessage(["log",context.id,[a,b,c],null]) 
+    
     if (!a) return context;
     if (b.value < 0) return context.error("rangerror");
+
     if (b.value + c.value.length > a.value.length) return context.error("rangerror");
-    if (a.type !== c.type) return context.error("rangerror");
+    if (a.type !== c.type) return context.error("typeerror");
     if (a.type == "array") {
        const s = a.value.slice(0, b.value).concat(c.value).concat(a.value.slice(b.value + c.value.length, a.value.length));
        a.replace(s);
