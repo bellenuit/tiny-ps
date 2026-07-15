@@ -5457,13 +5457,13 @@ class tinyPStag extends HTMLElement {
         if (node4) divnode.appendChild(node4);
         if (node5) divnode.appendChild(node5);
 		if (urlnode) divurlnode.appendChild(urlnode);
-		if (urlnode2) divurlnode.appendChild(urlnode2);
+		if (urlnode2 && !this.shadow.querySelector(".jscanvasurl")) divurlnode.appendChild(urlnode2);
 		if (urlnode2z) divurlnode.appendChild(urlnode2z);
 	    if (urlnode2m) divurlnode.appendChild(urlnode2m);
-		if (urlnode3) divurlnode.appendChild(urlnode3);
+		if (urlnode3 && !this.shadow.querySelector(".svgurl")) divurlnode.appendChild(urlnode3);
 	    if (urlnode3a) divurlnode.appendChild(urlnode3a);
-        if (urlnode4) divurlnode.appendChild(urlnode4);
-        if (urlnode5) divurlnode.appendChild(urlnode5); 
+        if (urlnode4 && !this.shadow.querySelector(".pdfurl")) divurlnode.appendChild(urlnode4);
+        if (urlnode5 && !this.shadow.querySelector(".gcodeurl")) divurlnode.appendChild(urlnode5); 
 		
 		
 	    // while (this.shadow.lastChild) this.shadow.removeChild(this.shadow.lastChild);
