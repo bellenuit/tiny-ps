@@ -59,6 +59,8 @@ Version 1.2.9 2026-06-30
 - new operator setlinejoin
 Version 1.3.0 2026-07-05
 - textmode 2: create smaller SVG using defs for paths
+Version 1.3.1 2026-07-16
+- GCODE device
 
 Renders a subset of PostScript to Canvas, SVG and PDF (as well as an obsucre raw rendering).
 The output can be displayed or proposed as downloadable link. It can be transparent.
@@ -5214,13 +5216,14 @@ class tinyPStag extends HTMLElement {
 	const errorMode = this.getAttribute("error") ?? 0;
 	var test = this.shadow.querySelector(".output");
 	var divnode = test ? test: document.createElement("DIV");
-	
+	var testurl = this.shadow.querySelector(".outputurl");
+	var divurlnode = testurl ? testurl : document.createElement("DIV");
 	
 	    divnode.part = "output";
 	    divnode.className = "output";
 	    divnode.style.height = "100%";
 	    divnode.style.width = "100%";
-	    var divurlnode = document.createElement("DIV");
+	    divurlnode.className = "outputurl";
 	    divurlnode.part = "url";
 	    test = this.shadow.querySelector(".divsvg");
 	    var divsvgnode = test ? test : document.createElement("DIV");
@@ -5460,11 +5463,11 @@ class tinyPStag extends HTMLElement {
 		if (urlnode3) divurlnode.appendChild(urlnode3);
 	    if (urlnode3a) divurlnode.appendChild(urlnode3a);
         if (urlnode4) divurlnode.appendChild(urlnode4);
-        if (urlnode5) divurlnode.appendChild(urlnode5);
+        if (urlnode5) divurlnode.appendChild(urlnode5); 
 		
 		
 	    // while (this.shadow.lastChild) this.shadow.removeChild(this.shadow.lastChild);
-	    if (this.shadow.childNodes.length != 3) {
+	    if (this.shadow.childNodes.length != 3) { 
 	    this.shadow.appendChild(divnode);
 	    this.shadow.appendChild(divurlnode);
 	    this.shadow.appendChild(errornode);
