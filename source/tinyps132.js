@@ -62,7 +62,7 @@ Version 1.3.0 2026-07-05
 Version 1.3.1 2026-07-16
 - GCODE device
 Version 1.3.2 2026-08-12
-- kshow, print operator
+- kshow, kwidthshow, print operator
 - moved non standard charpath operator to extensions
 - refactored show operator for type3mode
 - implemented type3mode in stringwidth and widthshow

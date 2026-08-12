@@ -236,11 +236,15 @@ x y **rmoveto**
 
 a **setalpha** (not native)
 
-array n ***setdash*** (only stub)
+array n ***setdash** (works in Canvas and SVG, ignored in raw and pdf device)
 
 n ***setflat*** (only stub)
 
 x **setgray** 
+
+number **setlinecap**
+
+number **setlinejoin**
 
 x **setlinewidth**
 
@@ -252,9 +256,9 @@ arrayof6 **setmatrix**
 
 ### Text
 
-string **charpath**
+any **cvn** number (convert to number)
 
-any **cvs** strinng (convert to string)
+any **cvs** string (convert to string)
 
 fontdictonary name **definefont** 
 
@@ -263,6 +267,10 @@ name **findfont** fontdictonary
 string n **get** value
 
 string start length **getinterval** string
+
+procedure string **kshow** y x 
+
+procedure cx cy ch string **kwidthshow** y x 
 
 string **length** number
 
@@ -387,6 +395,8 @@ procedure procedure2 condition **ifelse**
 
 procedure **loop** (don't forget exit in procedure)
 
+any **print** (to console)
+
 n procedure **repeat**
 
 file **run** (is not actually reading a file. string of file must be bound for use to object rpnFiles, here you need JavaScript).
@@ -424,6 +434,10 @@ A special device is rpnRawDevice. This code has started as an academic excerice 
 - a method to convert a stroke of a certain thickness to a polygon.
 - a mtehod to clip
 - a method to handle correctly painting with alpha channel on transparent objects.
+
+## GCODE device
+
+A device creating GCODE for plotters. Only stroke is rendered. A point is considered 1/96 inch.
 
 ## Font paths
 
