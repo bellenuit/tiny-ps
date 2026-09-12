@@ -437,7 +437,7 @@ A special device is rpnRawDevice. This code has started as an academic excerice 
 
 ## GCODE device
 
-A device creating GCODE for plotters. Only stroke is rendered. A point is considered 1/96 inch.
+A device creating GCODE for plotters. Only stroke is rendered. A point is considered 1/96 inch. You can use KugiStroke font to have stroke text.
 
 ## Font paths
 
@@ -449,7 +449,7 @@ If your fonts are not in the same folder than the HTML file, you will need to wr
 
 ## PostScript Errors
 
-If your code has error, the processor will stop and error will be shown in the Browser console:
+If your code has an error, the processor will stop and error will be shown in the Browser console:
 
 - Error type: **!typeerror** **!stackunderflow** **!stackunderflow** 
 - Current stack
