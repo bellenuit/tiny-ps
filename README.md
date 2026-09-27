@@ -409,6 +409,8 @@ dictionary **setpagedevice** (possible keys: canvas, canvasurl, color, console, 
 
 **showpage** (don't forget that one)
 
+filename **showfile** (not standard): collects all currently rendered pages in PDFs and saves them with the given filename into a ZIP folder.
+
 ## Architecture
 
 tinyPStag is an extension of HTML-element. It observes changes of the tiny-ps tag node, creates CANVAS, SVG or A nodes in the shadow DOM.
@@ -462,6 +464,22 @@ You can export multiple pages as movie (option movie) or animated SVG (svgmovie)
 
 <code>unzip PS__.zip
 ffmpeg -i PS__/ PS.mp4</code>
+
+## SVG for Word
+
+Word can read the SVG if it is transparent and has no fonts embedded. The default setpagedevice does enable that
+
+<code>/transparent 0 def /textmode 2 def currentdict setpagedevice</code>
+
+## Fonts in PDF
+
+Fonts are not embedded. They are substituted. If you want your fonts and keep the appearance, consider exporting paths only.
+
+<code>/textmode 0 def currentdict setpagedevice</code> 
+
+## Multiple PDF
+
+You can export multiple PDF as a ZIP folder and name explicitely each of the PDF. After **showpage** add the operator **(filename) showfile**.
 
 
 ## Bugs
