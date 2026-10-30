@@ -4125,7 +4125,7 @@ class tinyPStag extends HTMLElement {
 	var node, node2, node3, node4;
 	var urlnode, urlnode2, urlnode3, urlnode4;
     
-    if (formats.indexOf("raw") > -1 || formats.indexOf("rawurl") > -1) {
+    if (formats.indexOf("raw") > -1 || formats.indexOf("rawurl") > -1) {
 	    console.log("Adding rawnode");
         node = document.createElement("CANVAS");
         node.id = "raw" + this.id;
@@ -4158,7 +4158,7 @@ class tinyPStag extends HTMLElement {
 	        this.nodes.raw = node;
         }
     }
-    if (formats.indexOf("canvas") > -1 || formats.indexOf("canvasurl") > -1) {
+    if (formats.indexOf("canvas") > -1 || formats.indexOf("canvasurl") > -1) {
         console.log("Adding canvasnode");
         node2 = document.createElement("CANVAS");
         node2.id = "canvas" + this.id;
@@ -4191,7 +4191,7 @@ class tinyPStag extends HTMLElement {
         }
     }
 	        
-	if (formats.indexOf("svg") > -1 || formats.indexOf("svgurl") > -1) {        
+	if (formats.indexOf("svg") > -1 || formats.indexOf("svgurl") > -1) {        
         console.log("Adding svgnode");
         // let svgdivnode = document.createElement("DIV");
         node3 = document.createElement("SVG");
@@ -4228,7 +4228,7 @@ class tinyPStag extends HTMLElement {
 	    //divnode.appendChild(svgdivnode);
 	}
 	
-	if (formats.indexOf("pdf") > -1 || formats.indexOf("pdfurl") > -1) {   
+	if (formats.indexOf("pdf") > -1 || formats.indexOf("pdfurl") > -1) {   
         console.log("Adding pdfnode");
         node4 = document.createElement("IMG");
         node4.id = "pdf" + this.id;
@@ -4262,7 +4262,7 @@ class tinyPStag extends HTMLElement {
 	
 	if (node) divnode.appendChild(node);
 	if (node2) divnode.appendChild(node2);
-	if (node3) { divsvgnode.appendChild(node3); divnode.appendChild(divsvgnode) }
+	if (node3) { divsvgnode.appendChild(node3); divnode.appendChild(divsvgnode) }
 	if (node4) divnode.appendChild(node4);
 	if (urlnode) divnurlode.appendChild(urlnode);
 	if (urlnode2) divnurlode.appendChild(urlnode2);
@@ -4278,7 +4278,7 @@ class tinyPStag extends HTMLElement {
     
     worker.onmessage = function (e) {
 	    const msg = e.data; 
-		if (msg.length != 4) { 
+		if (msg.length != 4) { 
 			console.log("worker: formaterror"); worker.terminate(); 
 			return; 
 		}
@@ -4453,7 +4453,7 @@ customElements.define("tiny-ps", tinyPStag);
 workeronmessage = function (e) {
     
     const msg = e.data; 
-	if (msg.length != 4) { console.log("formaterror"); worker.terminate(); return; }
+	if (msg.length != 4) { console.log("formaterror"); worker.terminate(); return; }
 
 	const action = msg[0];
 	const id = msg[1];
@@ -4464,7 +4464,7 @@ workeronmessage = function (e) {
 	if(context.device.raw || context.device.rawurl) {
 		context.nodes.push(new rpnRawDevice());
 	}
-	if(context.device.canvas || context.device.canvasurl) {
+	if(context.device.canvas || context.device.canvasurl) {
 		context.nodes.push(new rpnCanvasDevice());
 	}
 	if(context.device.svg || context.device.svgurl) {

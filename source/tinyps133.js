@@ -268,7 +268,7 @@ rpnRawDevice = class {
 
     }
     finalize(context) {
-       if (context.device.raw || context.device.rawurl)  postMessage(["rawzip", context.id, null, null]);
+       if (context.device.raw || context.device.rawurl)  postMessage(["rawzip", context.id, null, null]);
         postMessage(["rawzip", context.id, null, null]);
     }
 
@@ -379,7 +379,7 @@ rpnRawDevice = class {
     }
     showpage(context) {
         const data = new ImageData(this.data, context.width * context.device.oversampling);
-        if (context.device.raw || context.device.rawurl)  postMessage(["raw", context.id, data, null]);       
+        if (context.device.raw || context.device.rawurl)  postMessage(["raw", context.id, data, null]);       
         this.clear(this.width, this.height, this.oversampling, this.transparent);
         return context;
     }
@@ -397,7 +397,7 @@ rpnCanvasDevice = class {
 
     }
     finalize(context) {
-        if (context.device.canvas || context.device.canvasurl) postMessage(["canvaszip", context.id, null, null]);
+        if (context.device.canvas || context.device.canvasurl) postMessage(["canvaszip", context.id, null, null]);
     }
     clear(width, height, oversampling, transparent) {
 	    this.width = width;
@@ -484,7 +484,7 @@ rpnCanvasDevice = class {
     showpage(context) {
 	    const data = this.ctx.getImageData(0, 0, this.node.width, this.node.height);
 	    
-	    if (context.device.canvas || context.device.canvasurl) postMessage(["canvas", context.id, data, null]);  		
+	    if (context.device.canvas || context.device.canvasurl) postMessage(["canvas", context.id, data, null]);  		
 	         
         this.ctx = null;
         return context;
@@ -517,7 +517,7 @@ rpnPDFDevice = class {
         if (Number.isFinite(height*1)) this.height = height;
     }
     finalize(context) {
-	    if (!(context.device.pdf || context.device.pdfurl)) return context;
+	    if (!(context.device.pdf || context.device.pdfurl)) return context;
 	    
         const objects = [];
         this.catalog.Type = "/Catalog";
@@ -627,7 +627,7 @@ rpnPDFDevice = class {
         return p.join(" ");
     }
     clip(context) {
-	    if (!(context.device.pdf || context.device.pdfurl)) return context;
+	    if (!(context.device.pdf || context.device.pdfurl)) return context;
 
         this.elements.push("q");
         for (let clip of context.graphics.clip) {
@@ -637,12 +637,12 @@ rpnPDFDevice = class {
         return context;
     }
     eofill (context) {
-	    if (!(context.device.pdf || context.device.pdfurl)) return context;
+	    if (!(context.device.pdf || context.device.pdfurl)) return context;
 
         return this.fill(context, false);
     }
     fill(context, zerowind = true) {
-	    if (!(context.device.pdf || context.device.pdfurl)) return context;
+	    if (!(context.device.pdf || context.device.pdfurl)) return context;
 
 	    if (context.showmode) return context;
         if (context.graphics.clip.length) context = this.clip(context);
@@ -673,7 +673,7 @@ rpnPDFDevice = class {
         this.elements.push("/GS"+gs+" gs");
     }
     setfont(context) {
-	    if (!(context.device.pdf || context.device.pdfurl)) return context;
+	    if (!(context.device.pdf || context.device.pdfurl)) return context;
 
         const f = {};
         f.Type = "/Font";
@@ -697,7 +697,7 @@ rpnPDFDevice = class {
 
     }
     show(s, context, targetwidth = 0, extraspace = 0) {
-	    if (!(context.device.pdf || context.device.pdfurl)) return context;
+	    if (!(context.device.pdf || context.device.pdfurl)) return context;
 
         if (context.graphics.clip.length) context = this.clip(context);
         this.setfont(context);
@@ -723,7 +723,7 @@ rpnPDFDevice = class {
         return context;
     }
     showpage(context) {
-	    if (!(context.device.pdf || context.device.pdfurl)) return context;
+	    if (!(context.device.pdf || context.device.pdfurl)) return context;
          const dict = {};
         dict.Type = "/Page";
         dict.Parent = "2 0 R";
@@ -762,7 +762,7 @@ rpnPDFDevice = class {
         return context;
     }
     stroke(context) {
-	    if (!(context.device.pdf || context.device.pdfurl)) return context;
+	    if (!(context.device.pdf || context.device.pdfurl)) return context;
         if (context.graphics.clip.length) context = this.clip(context);
         this.elements.push(this.getPath(context.graphics.path, false));
         this.setcolor(context);
@@ -811,7 +811,7 @@ rpnSVGDevice = class {
 
     }
     finalize(context) {
-    	if (context.device.svg || context.device.svgurl) postMessage(["svgfinal", context.id, null, null])
+    	if (context.device.svg || context.device.svgurl) postMessage(["svgfinal", context.id, null, null])
     }
     getPath(path, close = true) {
        const p = [];
@@ -1024,7 +1024,7 @@ rpnSVGDevice = class {
         
         
         
-        if (context.device.svg || context.device.svgurl) postMessage(["svg", context.id, this.node.outerHTML(), null])
+        if (context.device.svg || context.device.svgurl) postMessage(["svg", context.id, this.node.outerHTML(), null])
         this.clear(this.width, this.height, this.oversampling, this.transparent);
         return context;
     }
@@ -1069,7 +1069,7 @@ rpnSVGDevice = class {
 
     }
     finalize(context) {
-    	if (!(context.device.gcode || context.device.gcodeurl)) return context;
+    	if (!(context.device.gcode || context.device.gcodeurl)) return context;
     	postMessage(["gcodefinal", context.id, null, null])
     }
     getPath(path, context, close = true) {
@@ -1080,7 +1080,7 @@ rpnSVGDevice = class {
            var [linetype, x0, y0, x, y] = p;
            const precision = 10;
            const point2mm = 25.4/96; // use modern scale
-// rpnLineIntersection = function(x1, y1, x2, y2, x3, y3, x4, y4)
+// rpnLineIntersection = function(x1, y1, x2, y2, x3, y3, x4, y4)
            if (x < 0) 
                [x, y] = rpnLineIntersection(x0,y0,x,y,0,0,0,dev.height);
            if (x >= dev.width)
@@ -1108,7 +1108,7 @@ rpnSVGDevice = class {
 
            p.push(";");
            
-           if (lastx != x || lasty != y) {
+           if (lastx != x || lasty != y) {
                p.push("G0 Z0"); // pen up 
                p.push(`G0 X${ x } Y${ y  }`)
                p.push("G0 Z8"); // pen down 
@@ -1145,7 +1145,7 @@ rpnSVGDevice = class {
     }
     eofill (context) {
         // not supported
-        if (!(context.device.gcode || context.device.gcodeurl)) return context;
+        if (!(context.device.gcode || context.device.gcodeurl)) return context;
         return context;
     }
     fill(context, zerowind = true) {
@@ -1153,7 +1153,7 @@ rpnSVGDevice = class {
         return context;
     }
     stroke(context) {
-	    if (!(context.device.gcode || context.device.gcodeurl)) return context;
+	    if (!(context.device.gcode || context.device.gcodeurl)) return context;
         context = this.clip(context);
         if (this.color.length && this.color.toString() !== context.graphics.color.toString()) {
             this.lines.push(`; color changes from ${ this.color.toString()} to ${ context.graphics.color.toString()}`); 
@@ -1169,11 +1169,11 @@ rpnSVGDevice = class {
         return context;
     }
     showpage(context) {
-        if (!(context.device.gcode || context.device.gcodeurl)) return context;
+        if (!(context.device.gcode || context.device.gcodeurl)) return context;
         this.lines.push("; clean up");
         this.lines.push("G0 X0 Y0"); // go to origin       
         this.lines.push("M2"); // end
-        if (context.device.gcode || context.device.gcodeurl) postMessage(["gcode", context.id, this.lines, null])
+        if (context.device.gcode || context.device.gcodeurl) postMessage(["gcode", context.id, this.lines, null])
         this.clear(this.width, this.height, this.oversampling, this.transparent);
         return context;
     }
